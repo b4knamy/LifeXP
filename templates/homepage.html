@@ -1,0 +1,30 @@
+{% extends 'madethings/base.html' %}
+
+{% block content %}
+<div class="home">
+    <div id="user-content-info">
+        <div id="user-profile-content">
+            <div id="user-profile-img">
+                <img id="profile-img" src="static/images/{{ current_user.image }}.jpg">
+            </div>
+            <div id="user-profile-name">
+                <p style="color: var(--text-current-theme)" class="user-name"> {{ current_user.name }}</p>
+                <p style="color: var(--text-current-theme)" class="user-codename"> - {{ current_user.nickname }} -</p>
+            </div>
+            
+        </div>
+        <div class="user-status">
+            <a href="{{ url_for('myposts') }}"><button class="btn-my-post" type="button">Meus posts</button></a>
+            <a href="{{ url_for('saved_post') }}"><button class="btn-my-post" type="button">Posts salvos</button></a>
+            <a href="{{ url_for('profile', identifier=current_user.identifier) }}"><button class="btn-my-post" type="button">Meu perfil</button></a>
+        </div>
+    </div>
+
+    <div class="users-contents-posts">
+    {% block posts %}
+
+
+    {% endblock posts %}
+    </div>
+</div>
+{% endblock content %}

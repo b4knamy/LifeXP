@@ -1,0 +1,141 @@
+{% extends 'madethings/base.html' %}
+
+{% block content %}
+
+<div class="profile-main">
+    <div class="show-profile">
+        <div class="show-profile-information">
+            <div class="profile-information">
+                {% if not current_user.id == user.id %}
+                <div class="profile-options">
+                    {% if is_following %}
+                    <button title="Você já está seguindo esse usuário!" class="follow" value="{{ user.identifier }}">Seguindo</button>
+                    {% else %}
+                    <button title="Você não segue esse usuário!" class="follow" value="{{ user.identifier }}">Seguir</button>
+                    {% endif %}
+                </div>
+                {% else %}
+                {% endif %}
+                <p class="profile-user-name">{{ user.name }}</p>
+                <div class="profile-user-scores">
+                    <span title="Total de {{ user.info['likes'] }} likes"><i class="fa-regular fa-thumbs-up"></i>{{ user.info['likes'] }}</span>
+                    <span title="Total de {{ user.info['dislikes'] }} dislikes"><i class="fa-regular fa-thumbs-down"></i>{{ user.info['dislikes'] }}</span>
+                    <p title="Total de {{ user.info['posts'] }} posts">Posts: {{ user.info['posts'] }}</p>
+                    <p title="Total de {{ user.info['follows'] }} followers">Follows: {{ user.info['follows'] }}</p>
+                </div>
+            </div>
+            <div class="profile-show-image">
+                {% if current_user.id == user.id %}
+                <img src="/static/images/{{ user.image }}.jpg" onclick="showShowImg()" id="current-image" style="cursor: pointer;">
+                {% else %}
+                <img src="/static/images/{{ user.image }}.jpg">
+                {% endif %}
+            </div>
+        </div>
+        {% if not current_user.id == user.id %}
+        <div class="full-profile-information">
+            <div>
+                <span>Nome</span>
+                <div><p>{{ user.name }}</p></div>
+            </div>
+            <div>
+                <span>E-mail</span>
+                <div><p>**************************</p></div>
+            </div>
+            <div>
+                <span>Nickname</span>
+                <div><p>{{ user.nickname }}</p></div>
+            </div>
+            <div>
+                <span>Data de criação</span>
+                <div><p>{{ user.created_at }}</p></div>
+            </div>
+            <button type="button" onclick="history.back()">Voltar</button>
+        </div>
+        {% else %}
+        <form class="full-profile-information" action="{{ url_for('profile', identifier=user.identifier) }}" method="POST">
+            <div class="change-profile-info-input">
+                <label>Nome</label>
+                <input name="nome" type="text" value="{{ user.name }}">
+            </div>
+            <div class="change-profile-info-input">
+                <label>E-mail</label>
+                <input name="email" type="email" value="{{ user.email }}">
+            </div>
+            <div class="change-profile-info-input">
+                <label>Nickname</label>
+                <input name="nickname" type="text" value="{{ user.nickname }}">
+            </div>
+            <div class="change-profile-info-input">
+                <label>Senha atual</label>
+                <input name="password" type="password" placeholder="**********">
+                    {% with messages = get_flashed_messages() %}
+
+                        {% if messages %}
+                            
+                            {% for message in messages %}
+
+                                <p id="flash-message" style="color:red; font-style: italic;">{{ message }}</p>
+
+                            {% endfor %}
+
+                        {% endif %}
+
+                    {% endwith %}
+            </div>
+            <div class="change-profile-info-input">
+                <label>Nova senha</label>
+                <input name="new_password" type="password" placeholder="**********">
+            </div>
+            <div>
+                <span>Data de criação</span>
+                <div><p>{{ user.created_at }}</p></div>
+            </div>
+            <div>
+                <input type="text" style="display: none;" name="image" id="send-image" value="{{ user.image }}">
+                <button type="submit">Atualizar informações</button>
+                <button type="button" onclick="history.back()">Voltar</button>
+            </div>
+            
+        </form>
+        <div class="show-image-options">
+            <div>
+                <img class="select-each-image" src="{{ url_for('static', filename='images/balthier.jpg') }}" value="balthier">
+            </div>
+            <div>
+                <img class="select-each-image" src="{{ url_for('static', filename='images/ashe.jpg') }}" value="ashe">
+            </div>
+            <div>
+                <img class="select-each-image" src="{{ url_for('static', filename='images/basch.jpg') }}" value="basch">
+            </div>
+            <div>
+                <img class="select-each-image" src="{{ url_for('static', filename='images/fran.jpg') }}" value="fran">
+            </div>
+            <div>
+                <img class="select-each-image" src="{{ url_for('static', filename='images/vossler.jpg') }}" value="vossler">
+            </div>
+            <div>
+                <img class="select-each-image" src="{{ url_for('static', filename='images/vaan.jpg') }}" value="vaan">
+            </div>
+            <div>
+                <img class="select-each-image" src="{{ url_for('static', filename='images/penelo.jpg') }}" value="penelo">
+            </div>
+            <div>
+                <img class="select-each-image" src="{{ url_for('static', filename='images/reddas.jpg') }}" value="reddas">
+            </div>
+            <div>
+                <img class="select-each-image" src="{{ url_for('static', filename='images/larsa.jpg') }}" value="larsa">
+            </div>
+            <div>
+                <img class="select-each-image" src="{{ url_for('static', filename='images/unknow.jpg') }}" value="unknow">
+            </div>
+            
+            <button type="button" onclick="changeImg()">Selecionar</button>
+            <button type="button" onclick="closeShowImg()">Voltar</button>
+        </div>
+        {% endif %}
+    </div>
+    
+</div>
+
+{% endblock content %}

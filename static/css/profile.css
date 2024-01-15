@@ -1,0 +1,214 @@
+
+.profile-main {
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+.show-profile {
+    width: 700px;
+    height: auto;
+    border-radius: 10px;
+    background-color: rgba(95, 158, 160, 0.5);
+    padding: 10px;
+    position: relative;
+}
+.show-profile-information {
+    width: 700px;
+    height: 150px;
+    border-radius: 10px;
+    background-color: cadetblue;
+    box-shadow: 0 0 10px black;
+    display: flex;
+    flex-direction: row;
+    
+}
+.profile-information {
+    width: 479px;
+    height: 130px;
+    position: relative;
+    border-right: 1px solid black;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 10px;
+    gap: 90px;
+}
+.profile-information .profile-user-name {
+    font-size: 25px;
+    font-style: italic;
+    max-width: 300px;
+}
+.profile-information .profile-user-scores {
+    display: flex;
+    width: auto;
+    flex-direction: row;
+    position: absolute;
+    gap: 15px;
+    bottom: 5px;
+}
+.profile-information .profile-user-scores i {
+    transform: scale(1.4);
+    margin-left: 5px;
+    margin-right: 5px;
+}
+.profile-show-image {
+    width: 180px;
+    height: 130px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+}
+.profile-show-image img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+}
+img {
+    box-shadow: 0 0 15px black;
+}
+.profile-options {
+    position: absolute;
+    right: 0;
+    margin-right: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.profile-options button {
+    width: 60px;
+    height: 30px;
+    border-radius: 10px;
+    background-color: darkcyan;
+    cursor: pointer;
+}
+.full-profile-information {
+    border-radius: 10px;
+    background-color: cadetblue;
+    position: relative;
+    margin-top: 10px;
+    height: auto;
+    widows: 700px;
+    padding-bottom: 10px;
+    box-shadow: 0 0 10px black;
+    display: flex;
+    flex-direction: column;
+    padding-left: 20px;
+    padding-bottom: 30px;
+}
+.full-profile-information div {
+    border-radius: 10px;
+    margin-top: 10px;
+    width: 400px;
+    height: 60px;
+    padding: 5px;
+    position: relative;
+}
+.full-profile-information div div {
+    width: 90%;
+    height: 30px;
+    position: absolute;
+    padding-top: 15px;
+    background-color: cadetblue;
+    border: 1px solid black;
+    border-radius: 10px;
+    color: black;
+}
+.full-profile-information div div p {
+    margin-left: 7px;
+}
+.full-profile-information div span {
+    position: absolute;
+    top: 5px;
+    left: 30px;
+    padding: 0 5px;
+    border-radius: 10px;
+    background-color: cadetblue;;
+    z-index: 1;
+}
+.full-profile-information .change-profile-info-input label {
+    position: absolute;
+    top: 0;
+    left: 30px;
+    padding: 0 5px;
+    border-radius: 10px;
+    background-color: cadetblue;;
+    z-index: 1;
+}   
+.full-profile-information .change-profile-info-input input {
+    width: 90%;
+    height: 50px;
+    position: absolute;
+    top: 8px;
+    padding-left: 10px;
+    background-color: cadetblue;
+    border: 1px solid white;
+    font-size: 20px;
+    border-radius: 10px;
+    color: black;
+    outline: none;
+}
+.full-profile-information .change-profile-info-input input:hover {
+    border: 1px solid black;
+}
+.full-profile-information .change-profile-info-input input:focus {
+    border: 2px solid seagreen;
+    box-shadow: 0 0 10px seagreen;
+}
+.full-profile-information button {
+    width: 150px;
+    height: 40px;
+    border-radius: 10px;
+    background-color: white;
+    margin-left: 5px;
+    margin-top: 10px;
+    cursor: pointer;
+}
+.full-profile-information button:hover {
+    background-color: seagreen;
+}
+.show-image-options {
+    position: absolute;
+    top: 50px;
+    width: 630px;
+    border-radius: 15px;
+    background-color: rgba(0, 0, 0, 0.7);
+    height: auto;
+    z-index: 3;
+    padding: 30px;
+    display: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 30px;
+    box-shadow: inset 0 0 10px black;
+}
+.show-image-options div {
+    width: 100px;
+    height: 100px;
+}
+.show-image-options div img {
+    width: 100px;
+    height: 100px;
+    box-shadow: 0 0 15px black;
+    cursor: pointer;
+}
+.show-image-options div img:hover {
+    transform: scale(1.2);
+    transition: all 300ms linear;
+}
+.show-image-options button {
+    width: 100px;
+    height: 40px;
+    border-radius: 10px;
+    background-color: darkcyan;
+    cursor: pointer;
+}
+#current-image:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px white;
+    transition: all 300ms linear;
+
+}

@@ -1,0 +1,30 @@
+<div class="navbar-content">
+    <div class="toggle-button">
+      <div>
+        <input type="checkbox" class="checkbox" id="chk">
+        <label class="label" for="chk">
+          <div class="ball">
+            <img class="icon black-hole" src="/static/images/dark-hole-theme.png" alt="">
+          </div>
+        </label>
+      </div>
+    </div>
+    <h1 style="color: var(--text-current-theme); text-align: center;">- Life XP -</h1>
+    <div class="navbar-options">
+      {% if current_user.is_authenticated %}
+    
+            <a href="{{ url_for('homepage') }}" 
+            style="font-size: 20px; color: var(--dark-text-color); text-decoration: none; margin-right: 10px;">Inicio</a>
+          
+          
+            <a href="{{ url_for('logout') }}"><button class="nav-button"  type="button">Sair</button></a>
+      
+            {% else  %}
+          <a href="{{ url_for('login') }}"><button class="nav-button" type="button">Login</button></a>
+          <a href="{{ url_for('register') }}"><button class="nav-button" type="button">Cadastrar</button></a>
+
+
+        {% endif %}
+      </div>
+
+    </div>

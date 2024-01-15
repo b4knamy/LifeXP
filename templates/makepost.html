@@ -1,0 +1,27 @@
+{% extends 'madethings/base.html' %}
+
+
+{% block content %}
+
+<div class="users-contents-posts">
+
+    <h1 style="text-align: center;">Conte-nos sua historia :)</h1>
+
+    
+    <form class="make-post" action="{{ url_for('makepost') }}" method="POST">
+
+                <label  for="title">Titulo: </label>
+                <input type="text" minlength="5" maxlength="50" class="input-make-post" name="title" id="title" required>
+            
+                <label for="title">História: </label>
+                <textarea minlength="10"  type="text"  name="story" class="input-make-post div-story " id="story" required></textarea>
+
+                <a href=" {{ url_for('myposts') }}"><button type="submit" value="submit" class="btn-home-page">Criar post</button></a>
+                <a href="{{ url_for('myposts') }}"><button type="button" class="btn-home-page">Voltar</button></a>
+                
+
+    </form>
+    
+</div>
+
+{% endblock content %}

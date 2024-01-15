@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    {% include 'madethings/head.html' %}
+</head>
+
+<body>
+    
+    <div class="full-content-block">
+
+        <div class="navbar-container">
+                {% include 'madethings/navbar.html' %}
+        </div>
+
+        <div class="block-content">
+            {% block content %}
+
+
+            {% endblock content %}
+            
+        </div>
+        
+        <footer class="myfooter">
+            {% include 'madethings/footer.html' %}
+        </footer>
+        
+    </div>
+        
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='javascript/index.js') }}"></script>
+</body>
+
+</html>

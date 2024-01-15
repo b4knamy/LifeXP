@@ -1,0 +1,40 @@
+{% extends 'homepage.html' %}
+
+{% block posts %}
+
+{% if save_post == [] %}
+    <H1 style="color: var(--text-current-theme)">Você ainda não tem nenhum post salvado</H1>
+    {% else %}
+
+    {% for post in save_post %}
+
+    <div class="show-posts-list" style="color: var(--text-current-theme)">
+
+        <div class="list-posts-profile-user">
+            <div>
+                <img class="post-profile-img" src="static/images/{{ post.user.image }}.jpg" value="{{ post.user.identifier }}" class="go-to-profile">
+            </div>
+            <div class="user-profile-post">
+                <p style="font-size: 25px;">{{ showname(post.user.name) }}</p>
+            </div>
+        </div>
+
+        <div class="list-posts-title-user">
+            <div>
+            <a id="title-text-color" href="{{ url_for('post', identifier=post.identifier) }}">{{ post.titulo }}</a>
+            </div>
+            <div>
+                <i class="fa-regular fa-thumbs-up">{{ post.likes.length }}</i>
+                <i class="fa-regular fa-thumbs-down">{{ post.dislikes.length }}</i>
+                <p>postado {{ post.created_at }}</p>
+            </div>
+
+        </div>
+
+    </div>
+    {% endfor %}
+
+{% endif %}
+
+
+{% endblock posts %}

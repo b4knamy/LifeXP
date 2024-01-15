@@ -1,0 +1,186 @@
+.auth-main {
+    position: relative;
+    max-width: 1024px;
+    min-width: auto;
+    min-height: 100%;
+    max-height: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    gap: 100px;
+}
+.logo-lifexp {
+    width: 50%;
+    height: auto;
+    position: relative;
+    top: 10%;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+}
+.logo-lifexp p {
+    font-size: 20px;
+    color: var(--text-current-theme);
+}
+.logo-title {
+    font-size: 25px;
+}
+#flash-message {
+    position: relative;
+    left: 100%;
+    top: 15px;
+    z-index: 3;
+}
+.form-entry {
+    width: 50%;
+    height: auto;
+    position: relative;
+}
+.form-entry p {
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+.register {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px
+}
+.login {
+    top: 10%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 15px;
+}
+.logo-title {
+    font-size: 80px;
+    color: var(--text-current-theme);
+}
+.form-input {
+    border-radius: 10px;
+    width: 400px;
+    height: 30px;
+    margin: 10px;
+    padding: 10px;
+    font-size: 20px;
+}
+
+.form-input:hover {
+    box-shadow: 0 0 15px black;
+}
+
+.form-input:focus {
+    box-shadow: 0 0 30px 0 black;
+    background: var(--dark-bg-color-mix);
+    transition: all 500ms ease-in-out;
+} 
+
+.form-input:focus::placeholder {
+    color: brown;
+}
+
+.form-button {
+    width: 200px;
+    height: 40px;
+    border-radius: 20px;
+    position: relative;
+    top: 10px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 0 5px var(--dark-bg-color-1);
+    font-size: 20px;
+}
+.form-button:hover {
+    height: 50px;
+    width: 210px;
+    background:  var(--dark-bg-color-mix);
+    box-shadow:  0 0 10px var(--dark-text-color);
+    font-size: 25px;
+    color: brown;
+    transition: all 100ms ease-in-out;
+}
+
+
+@media screen and (min-width: 1024px) and (max-width: 1399px) {
+    .auth-main {
+        gap: 20px;
+    }
+    .logo-lifexp {
+        left: 2%;
+    }
+    .logo-lifexp p {
+        font-size: 15px;
+    }
+    .logo-title {
+        font-size: 70px;
+    }
+}
+
+
+
+/* ================================ */
+
+
+
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+    .auth-main {
+        flex-direction: column;
+        align-items: center;
+        justify-content: start;
+        gap: 0px;
+    }
+    .logo-lifexp {
+        top: 0;
+        width: 100%;
+    }
+    .logo-lifexp p {
+        text-align: center;
+    }
+    .logo-title {
+        font-size: 70px;
+        text-align: center;
+    }
+}
+
+
+
+/* ================================ */
+
+
+
+@media screen and (max-width: 767px) {
+    .auth-main {
+        flex-direction: column;
+        align-items: center;
+        justify-content: start;
+        gap: 0px;
+    }
+    .logo-lifexp {
+        top: 0;
+        width: 80%;
+    }
+    .logo-lifexp p {
+        text-align: center;
+        font-size: 12px;
+    }
+    .logo-title {
+        font-size: 25px;
+        text-align: center;
+    }
+    .form-entry {
+        width: 100%;
+    }
+    .form-input {
+        height: 25px;
+        width: 70%;
+    }
+    .register {
+        gap: 5px;
+        top: 5%;
+    }
+    .register .form-input {
+        height: 20px;
+    }
+}

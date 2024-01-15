@@ -1,0 +1,28 @@
+{% extends 'madethings/base.html' %}
+
+
+
+
+{% block content %}
+<div class="auth-main">
+    <div class="logo-lifexp">
+        <h1 class="logo-title">Bem vindo a LifeXP!</h1>
+        <p>Um lugar para compartilhar suas melhores experiências de vida :)</p>
+    </div> 
+        
+        <form class="form-entry register" action="{{ url_for('register') }}" method="POST">
+
+                <p  style="font-size: 20px; color: var(--text-current-theme);">Nos conte a sua história!</p>
+                <input class="form-input register-form" name="name" type="text" placeholder="Nome" maxlength="35" required>
+                
+                <input class="form-input register-form" name="nickname" type="text" placeholder="Apelido" required>
+
+                <input class="form-input register-form" name="email" type="email" placeholder="E-mail" required>
+
+                <input class="form-input register-form" name="password" type="password" placeholder="Password" required>
+
+                <button class="form-button register-button" type="submit">Cadastrar</button>
+            </form>
+
+        </div>
+{% endblock content %}

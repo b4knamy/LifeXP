@@ -1,0 +1,248 @@
+{% extends 'madethings/base.html' %}
+
+
+
+{% block content %}
+        
+
+    <div class="body-post-container">
+
+        <div class="main-post-content">
+            {% if post.user.id == current_user.id %}
+            <dialog id="update" class="modal-change">
+                <form class="form-modal-change" action=" {{ url_for('change_post', identifier=post.identifier) }} " method="POST">
+                    <div>
+                        <label for="modal-change-title">Novo titulo</label>
+                        <input  name="title" type="text" id="modal-change-title" required placeholder="..." maxlength="50" value="{{ post.titulo }}">
+                </div>
+                <div>
+                    <label for="modal-change-story">Nova história</label>
+                    <textarea name="story" id="modal-change-story" required >{{ post.texto }}</textarea>
+                </div>
+                    <div>
+                        <button type="submit">Alterar</button>
+                        <button type="button" onclick="document.getElementById('update').close()" >Cancelar</button>
+                    </div>
+            </form> 
+            </dialog>
+            <dialog id="delete" class="modal-delete">
+                <h2>Essa ação irá excluir este post, você tem certeza?</h2>
+                <div>
+                    <a href="{{ url_for('delete_post', identifier=post.identifier) }}"><button type="button">Excluir</button></a>
+                    <button type="button" onclick="document.getElementById('delete').close()" >Voltar</button>
+                </div>
+            </dialog>
+            {% endif %}
+                        
+
+                    
+
+                    <div class="hpc-options">
+                        <i class="fa-solid fa-bars"></i>
+                        <div class="dropdown-menu current-menu" id="first-menu">
+                            {% if post.user.id == current_user.id %}
+                            <button type="button" id="change-post-btn" onclick="document.getElementById('update').showModal();">Alterar</button>
+                            <button type="button" id="delete-post-btn" onclick="document.getElementById('delete').showModal()">Excluir</button>
+                            {% endif %}
+                            <button type="button" id="save-post-btn" value="{{ post.identifier }}">{% if post.is_saved %}Salvo{% else %}Salvar{% endif %}</button>
+                    </div>
+                    <div class="dropdown-menu" id="second-menu">
+                        <button type="button" id="second-menu-change" onclick="document.getElementById('update').showModal()">Alterar</button>
+                            <button onclick="cancelButton()" type="button" id="second-menu-cancel" >Cancelar</button>
+                    </div>
+                </div>
+                    
+
+                    <div class="hpc-title">
+                        <h2 class="post-titlearea">{{ post.titulo }}</h2>
+                        </div>
+
+                            
+                    <div class="hpc-rating">
+                        <div class='rating'>
+                            <img  id="user-profile-img" src="/static/images/{{ post.user.image }}.jpg"  alt="" value="{{ post.user.identifier }}" class="go-to-profile"> 
+                            <p>{{ post.user.name }}</p>
+                        </div>
+                        
+                    <div class="hpc-rating-info">
+                        <p>2 views</p>
+
+                        <span title="{% if post.likes.length == 0 %}Nenhuma avaliação{% else %} {% if post.likes.length == 1 %} 1 pessoa gostou deste post{% else %} {{ post.likes.length }} pessoas gostaram deste post {% endif %} {% endif %}" id="like" name="{{ post.identifier }}">{% if post.likes.is_liked %}<i class="fa-regular fa-thumbs-up" id="got-clicked"></i>{% if post.likes.length > 0 %} {{ post.likes.length}}{%endif%}{% else %}<i class="fa-regular fa-thumbs-up"></i>{% if post.likes.length > 0 %} {{ post.likes.length}}{%endif%} {% endif %}</span>
+
+                        <span title="{% if post.dislikes.length == 0 %}Nenhuma avaliação{% else %}{% if post.dislikes.length == 1%}1 pessoa não gostou do post{% else %}{{ post.dislikes.length }} pessoas não gostaram deste post{% endif %}{% endif %}" id="dislike" name="{{post.identifier}}">{% if post.dislikes.is_liked %}<i class="fa-regular fa-thumbs-down" id="got-clicked"></i>{% else %}<i class="fa-regular fa-thumbs-down"></i>{% endif %}
+                            {% if post.dislikes.length > 0 %} {{ post.dislikes.length }}{% endif %}</span>
+                        {% if is_following %}
+                            <span title="Você já está seguindo esse usuário!" class="follow-user follow" value="{{ post.user.identifier }}">Seguindo</span>
+                        {% else %}
+                            <span title="Você não segue esse usuário!" class="follow-user follow" value="{{ post.user.identifier }}">Seguir</span>
+                        {% endif %}
+
+                        <button type="button" onclick="makeComent()">Comentar</button>
+                    </div>
+                    </div>
+
+                    <div class="hpc-content">
+                            <p class="post-textarea text-class-get" id="hpc-content-child">{{ post.texto }}
+                            </p>
+                    </div>
+
+            </div>
+
+            
+            <form class="making-a-comment" action="{{ url_for('comment', identifier=post.identifier, mode='c', answer_identifier='None') }}
+            " method="POST">
+                <textarea name="answer" cols="30" rows="10" placeholder="Digite seu comentário aqui..." minlength="1" required></textarea>
+                <div>
+                    <button type="submit">Publicar</button>
+                    <button type="button" onclick="hideComent()">Cancelar</button>
+                </div>
+            </form>
+            {% if not post.comments == [] %}
+
+            <div class="answer-post-container">       
+        {% for comment in post.comments %}
+
+
+                <div class="answer-full-interact-coments">
+                    
+                    <div class="answer-user-container" id="father-user-container">
+                        {% if not comment.answers == None %}
+                                <div class="line-separator-x-first"></div>
+                            {% endif %}
+                        <div class="answer-user-profile a-u-p-img">
+                            {% if comment.len_answer >= 1 %}
+                            <div class="answer-count">
+                            <abbr title="Esconder respostas"><i class="fa-solid fa-chevron-up"></i></abbr>
+                            <p>{{ comment.len_answer }}</p>
+                        </div>
+                        {% endif %}
+                        <img src="/static/images/{{ comment.user.image }}.jpg" alt="" value="{{ comment.user.identifier }}" class="go-to-profile">
+                        </div>
+
+                        <div class="answer-user-content a-u-c" id="subanswer-content">
+
+                            <div class="answer-user-content-name a-u-c-n">
+                                <p>{{ showname(comment.user.name) }} - comentou:</p>
+                            </div>
+                            <div class="answer-user-content-text a-u-c-t">
+                                <p class="text-class-get">{{ comment.text }}
+                                </p>
+                            </div>
+                            <div class="answer-user-content-options a-u-c-o">
+                                <p id="show-answer-form">Responder</p>
+                                <p title="{% if comment.likes.length == 0 %}Nenhuma avaliação{% else %} {% if comment.likes.length == 1 %} 1 pessoa gostou desse comentário{% else %} {{ comment.likes.length }} pessoas gostaram desse comentário{% endif %} {% endif %}" id="like" name="{{ comment.identifier }}" >{% if comment.likes.is_liked %}<i class="fa-regular fa-thumbs-up" id="got-clicked"></i>{% if comment.likes.length > 0 %} {{ comment.likes.length}}{%endif%}{% else %}<i class="fa-regular fa-thumbs-up"></i> {% if comment.likes.length > 0 %} {{ comment.likes.length}}{%endif%}{% endif %}</p>
+
+                        <p title="{% if comment.dislikes.length == 0 %}Nenhuma avaliação{% else %}{% if comment.dislikes.length == 1%}1 pessoa não gostou desse comentário{% else %}{{ comment.dislikes.length }} pessoas não gostaram desse comentário{% endif %}{% endif %}" id="dislike" name="{{comment.identifier}}">{% if comment.dislikes.is_liked %}<i class="fa-regular fa-thumbs-down" id="got-clicked"></i>{% if comment.dislikes.length > 0 %} {{ comment.dislikes.length}}{%endif%}{% else %}<i class="fa-regular fa-thumbs-down"></i>{% if comment.dislikes.length > 0 %} {{ comment.dislikes.length}}{%endif%}{% endif %}</p>
+                                <span>-</span>
+                                <span>comentou {{ comment.created_at }} {% if comment.was_edited == 'true' %}
+                                    [Editado]
+                                {% endif %}
+                                </span>
+                                    {% if current_user.id == comment.user.id %}
+                                    <button type="button" id="edit-post">Editar</button>
+                                    <a href="{{ url_for('delete_comment', identifier=post.identifier, answer_identifier=comment.identifier, mode='pa') }}"><button type="button">Excluir</button></a>
+                                    {% endif %}
+                                    
+
+                                
+                            </div>
+
+                        </div> 
+                        {% if current_user.id == comment.user.id %}
+                        <form class="editing-comment editing-default" id="editing-answer" action="{{ url_for('comment', identifier=post.identifier, mode='ec', answer_identifier=comment.identifier) }}" method="POST">
+                            <textarea name="answer" placeholder="Escreva sua resposta aqui..." required></textarea>
+                            <div>
+                            <button type="submit">Editar</button>
+                            <button type="button" id="cancel-edit-post">Cancelar</button>
+                            </div>
+                        </form>
+                        {% endif %}
+                    </div>
+                    <div class="flex-fsuc">
+            {% if not comment.answers == None %}
+
+                {% for answer in comment.answers %}
+                    
+                    <div class="full-subanswer-user-container">
+                        <div class="line-separator-x"></div>
+                        <div class="line-separator-y"></div>
+    
+                        <div class="subanswer-user-container" id="father-user-container">
+                            
+                            <div class="subanswer-user-profile a-u-p-img">
+                                <img src="/static/images/{{ answer.user.image }}.jpg" alt="" value="{{ answer.user.identifier }}" class="go-to-profile">
+                            </div>
+    
+                            <div class="subanswer-user-content a-u-c" id="subanswer-content">
+    
+                                <div class="subanswer-user-content-name a-u-c-n">
+                                    <p> {{ showname(answer.user.name) }} - respondeu:</p>
+                                </div>
+                                <div class="subanswer-user-content-text a-u-c-t">
+                                    <p class="text-class-get">{{ answer.text }}
+                                    </p>
+                                </div>
+                                <div class="subanswer-user-content-options a-u-c-o">
+                                    <p id="show-answer-form">Responder</p>
+                                    
+                                    <p title="{% if answer.likes.length == 0 %}Nenhuma avaliação{% else %} {% if answer.likes.length == 1 %} 1 pessoa gostou dessa resposta{% else %} {{ answer.likes.length }} pessoas gostaram dessa resposta {% endif %} {% endif %}" id="like" name="{{ answer.identifier }}" >{% if answer.likes.is_liked %}<i class="fa-regular fa-thumbs-up" id="got-clicked"></i> {% if answer.likes.length > 0 %} {{ answer.likes.length}}{%endif%}{% else %}<i class="fa-regular fa-thumbs-up"></i> {% if answer.likes.length > 0 %} {{ answer.likes.length}}{%endif%}{% endif %}</p>
+
+                        <p title="{% if answer.dislikes.length == 0 %}Nenhuma avaliação{% else %}{% if answer.dislikes.length == 1%}1 pessoa não gostou dessa resposta{% else %}{{ answer.dislikes.length }} pessoas não gostaram dessa resposta{% endif %}{% endif %}" id="dislike" name="{{answer.identifier}}">{% if answer.dislikes.is_liked %}<i class="fa-regular fa-thumbs-down" id="got-clicked"></i>{% if answer.dislikes.length > 0 %} {{ answer.dislikes.length}}{%endif%}{% else %}<i class="fa-regular fa-thumbs-down"></i>{% if answer.dislikes.length > 0 %} {{ answer.dislikes.length}}{%endif%}{% endif %}</p>
+                                    <span>-</span>
+                                    <span>respondeu {{ answer.created_at }}</span>
+                                        {% if current_user.id == answer.user.id %}
+                                        <button type="button" id="edit-post">Editar</button>
+                                        <a href="{{ url_for('delete_comment', identifier=post.identifier, answer_identifier=answer.identifier, mode='psa') }}"><button type="button" id="delete-answer">Excluir</button></a>
+                                        {% endif %}
+                                </div>
+    
+                            </div>
+                            <!-- EDITTING ANSWER -->
+                            {% if current_user.id == answer.user.id %}
+                                <form class="editing-comment editing-default" id="editing-answer" action="{{ url_for('comment', identifier=post.identifier, mode='ea', answer_identifier=answer.identifier) }}" method="POST">
+                                <textarea name="answer" placeholder="Escreva sua resposta aqui..." required></textarea>
+                                <div>
+                                <button type="submit">Editar</button>
+                                <button type="button" id="cancel-edit-post">Cancelar</button>
+                                </div>
+                            </form>
+                            {% endif %}
+                            <!-- finish EDITTING ANSWER -->
+                            
+
+                        </div>
+                        </div>
+                
+                    
+
+                {% endfor %}
+                
+
+            {% endif %}
+        
+            
+                
+                
+            </div>
+            <div class="making-a-answer">
+                <form class="sending-answer" action="{{ url_for('comment', identifier=post.identifier, mode='a', answer_identifier=comment.identifier) }}" method="POST">
+                    <textarea name="answer" cols="30" rows="10" minlength="10" placeholder="Escreva sua resposta aqui..." required></textarea>
+                    <div>
+                        <button type="submit">Responder</button>
+                        <button type="button" 
+            id="cancel-answer-form">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+                    </div>
+        
+
+        {% endfor %}
+    </div>
+
+        
+        {% endif %}
+
+
+    </div>
+{% endblock content %}

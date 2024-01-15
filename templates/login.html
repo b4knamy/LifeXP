@@ -1,0 +1,30 @@
+{% extends 'madethings/base.html' %}
+{% block content %}
+<div class="auth-main">
+  <div class="logo-lifexp">
+    <h1 class="logo-title">Bem vindo a LifeXP!</h1>
+    <p>Um lugar para compartilhar suas melhores experiências de vida :)</p>
+  </div>
+
+  <form class="form-entry login" action="{{ url_for('login')}}" method="POST">
+        <legend style="font-size: 20px; color: var(--text-current-theme);">Seja bem-vindo!</legend>
+        {% with messages = get_flashed_messages() %}
+
+          {% if messages %}
+            
+            {% for message in messages %}
+
+              <p style="color:red; font-style: italic;">{{ message }}</p>
+
+            {% endfor %}
+
+          {% endif %}
+
+        {% endwith %}
+
+        <input class="form-input" type="email" name="email" placeholder="Email" required>
+        <input class="form-input" type="password" name="password" placeholder="Password" required>
+        <button class="form-button" type="submit">Entrar</button>
+      </form>
+    </div>
+{% endblock content %}

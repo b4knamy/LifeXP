@@ -1,0 +1,326 @@
+/*                             BASE CSS                                */
+* {
+    padding: 0;
+    margin: 0;
+    border: 0;
+}
+p {
+    word-wrap: break-word;
+}
+html {
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+body {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+}
+*::-webkit-scrollbar {
+    width: 5px;
+}
+*::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.2)
+}
+*::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+    background-color: cadetblue;
+    border: 1px solid black;
+}
+.light {
+    --dark-bg-color-1: rgb(240, 240, 240);
+    --text-current-theme: black;
+    --dark-bg-color-2: darkgray;
+    --dark-bg-color-mix: linear-gradient(180deg, rgb(240, 240, 240), darkgray, rgb(240, 240, 240));
+    --dark-text-color: brown;
+    --icon-color: rgb(117, 133, 0);
+}
+body {
+    --dark-bg-color-1: rgb(60, 57, 59);
+    --dark-bg-color-2: darkgray;
+    --dark-bg-color-mix: linear-gradient(360deg, rgb(60, 57, 59), darkgray, rgb(60, 57, 59));
+    --dark-text-color: brown;
+    --icon-color: brown;
+    --background-op: rgba(0, 0, 0, 0.3);
+    --text-current-theme: rgb(240, 240, 240);
+    transition: all 300ms linear;
+
+    background-color: var(--dark-bg-color-1);
+    overflow-x: hidden;
+}
+
+/* NAVBAR CONFIGS */
+
+.navbar-container {
+    grid-area: 1 / 1 / 2 / 2;
+    width: 100%;
+    height: 50px;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: grid;
+    grid-template-columns: auto minmax(auto, 1024px)  auto;
+    grid-template-rows: 100%;
+    justify-content: center;
+}
+.navbar-content {
+    grid-area: 1 / 2 / 2 / 3;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.navbar-content h1 {
+    position: absolute;
+    left: 45%;
+}
+.navbar-options {
+    height: 100%;
+    width: 80px;
+    position: absolute;
+    right: 5%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+.toggle-button {
+    height: 100%;
+    width: auto;
+    position: absolute;
+    left: 0;
+    top: 5px;
+}
+.nav-button {
+    height: 40px;
+    width: 80px;
+    border-radius: 15px !important;
+    color: black;
+    background-color: white;
+    border: 0px;
+}
+#nav-button:hover {
+    background-color: black;
+    color: var(--dark-text-color);
+    box-shadow:  0 0 20px 0 rgba(255, 0, 8, 0.908);
+    transition: all 300ms ease-in-out;
+    border: 0;
+    padding: 0; 
+}
+
+.icon {
+    background: var(--icon-color);
+    width: 30px;
+    height: 30px;
+    border-radius: 50px;
+    transition: background 400ms linear;
+}
+.checkbox {
+    opacity: 0;
+    position: absolute;
+}
+.label {
+    box-shadow:  0 0 10px 0 var(--icon-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 40px;
+    height: 40px;
+    position: relative;
+    left: 10px;
+    border-radius: 50px;
+}
+.label:hover {
+    box-shadow:  0 0 25px 0 var(--icon-color);
+    transform: scale(1.1);
+}
+.label .ball {
+    width: 30px;
+    height: 30px;
+    border-radius: 50px;
+    background-color: black;
+    position: absolute;
+    left: 5px;
+}
+
+/* END NAVBAR CONFIGS */
+
+/* BASE CONFIGS */
+.full-content-block {
+    width: 100vw;
+    min-height: 100vh;
+    max-height: auto;
+    position: absolute;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 50px minmax(100vh, auto) 50px;
+    padding: 0px !important;
+}
+
+.block-content {
+    grid-area: 2 / 1 / 3 / 2;
+    position: relative;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 30px 0px;
+}
+
+/* FOOTER CONFIGS */
+
+.myfooter {
+    grid-area: 3 / 1 / 4 / 2;
+    background-color: rgba(0, 0, 0, 0.6);
+    position: absolute;
+    bottom: 0;
+    height: 50px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    z-index: 1;
+    
+}
+
+#mycredits {
+    position: absolute;
+    left: 0;
+    margin-left: 20px;
+    float: left;
+    color:cadetblue;
+}
+
+#footer-info {
+    position: absolute;
+    right: 0;
+    margin-right: 20px;
+    margin-right: 70px;
+    float: right;
+    color: cadetblue;
+    display: flex;
+    flex-direction: row;
+}
+
+.link-color {
+    color: cadetblue;
+    text-decoration: none;
+}
+
+.link-color:hover {
+    transition: 500ms ease-in-out;
+    color: crimson;
+}
+
+/* END FOOTER CONFIGS */
+
+
+
+
+@media screen and (min-width: 1024px) and (max-width: 1399px) {
+    .navbar-options {
+        right: 20%;
+    }
+    .navbar-container h1 {
+        left: 40%;
+    }
+}
+
+
+
+/* ================================ */
+
+
+
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+    .navbar-options {
+        right: 15%;
+    }
+    .navbar-options button {
+        width: 80px !important;
+    }
+    .navbar-container h1 {
+        left: 40%;
+    }
+
+    .myfooter {
+        height: 100px;
+    }
+    #mycredits, #footer-info {
+        font-size: 14px;
+    }
+    .block-content {
+        position: relative;
+        height: 800px;
+    }
+}
+
+
+
+/* ================================ */
+
+
+
+@media screen and (max-width: 767px) {
+    .navbar-options {
+        right: 7%;
+        gap: 5px ;
+    }
+    .navbar-options button {
+        height: 25px !important;
+        width: 45px !important;
+        font-size: 10px !important;
+    }
+    .navbar-container h1 {
+        left: 35%;
+        font-size: 20px;
+    }
+
+    .myfooter {
+        height: 60px;
+        flex-direction: column;
+        gap: 10px;
+        justify-content: center;
+        align-items: center;
+        padding: 0px 5px;
+    }
+    #mycredits, #footer-info {
+        font-size: 10px;
+        position: relative;
+        margin-right: 0;
+        margin-left: 0;
+    }
+}
+
+
+
+
+
+/* 
+
+
+@media screen and (min-width: 1024px) and (max-width: 1399px) {
+    
+}
+
+
+
+/* ================================ */
+
+
+/* 
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+    
+} */
+
+
+
+/* ================================ */
+
+
+
+/* @media screen and (max-width: 767px) {
+    
+}  */
