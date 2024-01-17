@@ -119,12 +119,6 @@ class Post:
             else:
                 self.is_saved = True
 
-class Follow:
-    
-    def __init__(self, followed_user, following_user):
-        self.followed_user = followed_user
-        self.following_user = following_user
-
 
 class Comment:
 
@@ -174,5 +168,4 @@ class Lod:
         else:
             self.is_liked = True
 
-        
     

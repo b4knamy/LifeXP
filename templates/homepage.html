@@ -13,10 +13,11 @@
             </div>
             
         </div>
-        <div class="user-status">
+        <div class="user-home-options">
             <a href="{{ url_for('myposts') }}"><button class="btn-my-post" type="button">Meus posts</button></a>
             <a href="{{ url_for('saved_post') }}"><button class="btn-my-post" type="button">Posts salvos</button></a>
             <a href="{{ url_for('profile', identifier=current_user.identifier) }}"><button class="btn-my-post" type="button">Meu perfil</button></a>
+            <a href="{{ url_for('makepost') }}"><button class="btn-my-post" type="button">Fazer post</button></a>
         </div>
     </div>
 

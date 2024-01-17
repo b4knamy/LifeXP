@@ -53,9 +53,7 @@
                 </div>
                     
 
-                    <div class="hpc-title">
-                        <h2 class="post-titlearea">{{ post.titulo }}</h2>
-                        </div>
+                    
 
                             
                     <div class="hpc-rating">
@@ -80,6 +78,9 @@
                         <button type="button" onclick="makeComent()">Comentar</button>
                     </div>
                     </div>
+                    <div class="hpc-title">
+                        <h2 class="post-titlearea">{{ post.titulo }}</h2>
+                        </div>
 
                     <div class="hpc-content">
                             <p class="post-textarea text-class-get" id="hpc-content-child">{{ post.texto }}
@@ -191,8 +192,9 @@
                                     <span>-</span>
                                     <span>respondeu {{ answer.created_at }}</span>
                                         {% if current_user.id == answer.user.id %}
+                                        <div>
                                         <button type="button" id="edit-post">Editar</button>
-                                        <a href="{{ url_for('delete_comment', identifier=post.identifier, answer_identifier=answer.identifier, mode='psa') }}"><button type="button" id="delete-answer">Excluir</button></a>
+                                        <a href="{{ url_for('delete_comment', identifier=post.identifier, answer_identifier=answer.identifier, mode='psa') }}"><button type="button" id="delete-answer">Excluir</button></a></div>
                                         {% endif %}
                                 </div>
     

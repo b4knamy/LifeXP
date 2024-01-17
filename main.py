@@ -21,72 +21,46 @@ def load_user(user_id):
     return User(db_execute(f'SELECT * FROM user WHERE id = {user_id};', 'GET').fetchone())
 
 
-#       PAGES'S LOGIC
-
-@app.route('/post/<identifier>', methods=['GET'])
-def post(identifier):
-    # GETTING THE MAIN POST DATA
-
-    current_post = db_execute(f'SELECT * FROM post WHERE identifier = "{identifier}"', 'GET').fetchone()
-    main_post = Post(
-                id=current_post[0],
-                user_id=current_post[1],
-                titulo=current_post[2],
-                texto=current_post[3],
-                created_at=current_post[4],
-                identifier=current_post[5],
-                was_edited=current_post[6],
-                current_user_id=current_user.id,
-                get_lod='GET',
-                for_post='GET'
-            )
-    # GETTING THE MAIN POST DATA          ---END
-
-    # CHECKING IF THE CURRENT USER IS FOLLOWING THE POST OWNER
-
-    if db_execute(f'SELECT * FROM follow WHERE following_id = {current_user.id} and followed_id = {main_post.user.id}', 'GET').fetchone() == None:
-        is_already_followed = False
-    else:
-        is_already_followed = True
-
-    
-    
-
-    # CHECKING IF THE CURRENT USER IS FOLLOWING THE POST OWNER       ---END
-
-    return render_template('posts.html', post=main_post, is_following=is_already_followed, showname=showname)
-    
+#       PAGES'S LOGIC  
  
 @app.route('/')
 def home():
-    logout_user()
+    if current_user.is_authenticated:
+        return redirect(url_for('homepage'))
+    
     return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    error = None
+
     if request.method == 'POST':
 
         # Informations got by entry from the user
         password = request.form.get('password')
         email = request.form.get('email')
 
-        # checking if the users password is equal
-        user_logged = User(db_execute(f"SELECT * FROM user WHERE email = '{email}'", 'GET').fetchone())
+        # checking if the user password is equal
+        is_an_user = db_execute(f"SELECT * FROM user WHERE email = '{email}'", 'GET').fetchone()
 
-        if check_password_hash(pwhash=user_logged.password, password=password):
+        if is_an_user == None:
 
-            login_user(user_logged)
+            flash('Email incorreto, tente novamente.')
 
-            return redirect(url_for('homepage'))
-        
         else:
-            flash('Seu email ou senha está incorreta, tente novamente!')
 
-    resp = make_response(render_template('login.html', error=error))
-    return resp
+            user_logged = User(is_an_user)
+            if check_password_hash(pwhash=user_logged.password, password=password):
 
-@app.route('/register', methods=['GET', 'POST'])
+                login_user(user_logged)
+
+                return redirect(url_for('homepage'))
+            else:
+
+                flash('Seu senha está incorreta, tente novamente!')
+
+    return render_template('login.html')
+
+@app.route('/register', methods=['POST'])
 def register():
 
     if request.method == 'POST':
@@ -97,23 +71,18 @@ def register():
         password = request.form.get('password')
 
         hashed_password = generate_password_hash(password=password, salt_length=16)
-
-        db_execute(f"INSERT INTO user (name, nickname, email, password, identifier, created_at) VALUES ('{name}', '{nickname}', '{email}', '{hashed_password}', '{create_identifier(12)}', '{time_now(mode='register')}');")
         
-        return redirect(url_for('login'))
+        new_user = db_execute(f'SELECT * FROM user WHERE email = "{email}";', 'GET').fetchone()
+
+        if new_user == None:
+
+            db_execute(f"INSERT INTO user (name, nickname, email, password, identifier, created_at) VALUES ('{name}', '{nickname}', '{email}', '{hashed_password}', '{create_identifier(12)}', '{time_now(mode='register')}');")
+
+            return redirect(url_for('login'))
+        else:
+            flash('Esse email já está sendo usado.')
 
     return render_template('register.html')
-
-
-@app.route('/sucessfully', methods=['GET', 'POST'])
-def sucess():
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
-    return render_template('homepage.html')
-
-@app.route('/failed')
-def failed():
-    return render_template('failed.html')
 
 @app.route('/logout')
 def logout():
@@ -146,6 +115,7 @@ def homepage():
 
 
 @app.route('/myposts')
+@login_required
 def myposts():
         
         all_posts = db_execute(f'SELECT * FROM post WHERE user_id = {current_user.id}', 'GET').fetchall()
@@ -169,6 +139,7 @@ def myposts():
         return render_template('showing_user_posts.html', user_posts=result,  showname=showname)
 
 @app.route('/makepost', methods=['GET', 'POST'])
+@login_required
 def makepost():
 
     if request.method == 'POST':
@@ -183,7 +154,45 @@ def makepost():
 
     return render_template('makepost.html')
 
+
+@app.route('/post/<identifier>', methods=['GET'])
+@login_required
+def post(identifier):
+    # GETTING THE MAIN POST DATA
+
+    current_post = db_execute(f'SELECT * FROM post WHERE identifier = "{identifier}"', 'GET').fetchone()
+    main_post = Post(
+                id=current_post[0],
+                user_id=current_post[1],
+                titulo=current_post[2],
+                texto=current_post[3],
+                created_at=current_post[4],
+                identifier=current_post[5],
+                was_edited=current_post[6],
+                current_user_id=current_user.id,
+                get_lod='GET',
+                for_post='GET'
+            )
+    # GETTING THE MAIN POST DATA          ---END
+
+    # CHECKING IF THE CURRENT USER IS FOLLOWING THE POST OWNER
+
+    if db_execute(f'SELECT * FROM follow WHERE following_id = {current_user.id} and followed_id = {main_post.user.id}', 'GET').fetchone() == None:
+        is_already_followed = False
+    else:
+        is_already_followed = True
+
+    
+    
+
+    # CHECKING IF THE CURRENT USER IS FOLLOWING THE POST OWNER       ---END
+
+    return render_template('posts.html', post=main_post, is_following=is_already_followed, showname=showname)
+
+
+
 @app.route('/change_post/<identifier>', methods=['POST'])
+@login_required
 def change_post(identifier):
     
     if request.method == 'POST':
@@ -196,12 +205,14 @@ def change_post(identifier):
         return redirect(url_for('post', identifier=identifier))
 
 @app.route('/delete-post/<identifier>', methods=["GET"])
+@login_required
 def delete_post(identifier):
     db_execute(f'DELETE FROM post WHERE identifier = "{identifier}"')
 
     return redirect(url_for('myposts'))
 
 @app.route('/delete-comment/<identifier>/<answer_identifier>/<mode>')
+@login_required
 def delete_comment(identifier, answer_identifier, mode):
     
     if mode == 'pa':
@@ -218,6 +229,7 @@ def delete_comment(identifier, answer_identifier, mode):
 
 
 @app.route('/comment/<identifier>/<mode>/<answer_identifier>', methods=['POST'])
+@login_required
 def comment(identifier, mode, answer_identifier):
     if request.method == 'POST':
         text = request.form.get('answer')
@@ -256,6 +268,7 @@ def comment(identifier, mode, answer_identifier):
 
 @app.route('/profile/follow/<identifier>', methods=['POST'])
 @app.route('/post/follow/<identifier>', methods=['POST'])
+@login_required
 def follow(identifier):
         
         followed_user_id = db_execute(f"SELECT id FROM user WHERE identifier = '{identifier}';", 'GET').fetchone()[0]
@@ -273,6 +286,7 @@ def follow(identifier):
         return "success", 200
 
 @app.route('/post/lod/<identifier>/<mode>', methods=['POST'])
+@login_required
 def lod(identifier, mode):
         
         identifier_size = len(identifier)
@@ -336,7 +350,8 @@ def lod(identifier, mode):
 
         return "sucess", 200
         
-@app.route('/profile/<identifier>', methods=['POST', 'GET']) 
+@app.route('/profile/<identifier>', methods=['POST', 'GET'])
+@login_required
 def profile(identifier):
     error = None
     get_user = db_execute(f'SELECT * FROM user WHERE identifier = "{identifier}";', 'GET').fetchone()
@@ -408,6 +423,7 @@ def profile(identifier):
 
 
 @app.route('/post/save_post/<identifier>', methods=['POST'])
+@login_required
 def saving_post(identifier):
     post_id = db_execute(f'SELECT id FROM post WHERE identifier = "{identifier}";', 'GET').fetchone()[0]
 
@@ -421,6 +437,7 @@ def saving_post(identifier):
     return 'sucess', 200
 
 @app.route('/saved_posts')
+@login_required
 def saved_post(): 
 
     all_save_post = db_execute(f'SELECT post_id FROM save_post WHERE user_id = {current_user.id}', 'GET').fetchall()
@@ -447,4 +464,4 @@ def saved_post():
 #   RUNNING THE APP IF IS MAIN
 if __name__ == '__main__':
     app.secret_key = 'LXproject'
-    app.run(debug=True)
+    app.run()

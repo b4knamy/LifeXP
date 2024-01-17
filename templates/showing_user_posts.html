@@ -27,8 +27,10 @@
                 <a id="title-text-color" href="{{ url_for('post', identifier=post.identifier) }}">{{ post.titulo }}</a>
                 </div>
                 <div>
+                    <div>
                     <i class="fa-regular fa-thumbs-up">{{ post.likes.length }}</i>
                     <i class="fa-regular fa-thumbs-down">{{ post.dislikes.length }}</i>
+                </div>
                     <p>postado {{ post.created_at }}</p>
                 </div>
 

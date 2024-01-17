@@ -13,6 +13,19 @@
         <form class="form-entry register" action="{{ url_for('register') }}" method="POST">
 
                 <p  style="font-size: 20px; color: var(--text-current-theme);">Nos conte a sua história!</p>
+                {% with messages = get_flashed_messages() %}
+
+                    {% if messages %}
+            
+                        {% for message in messages %}
+
+                            <p style="color:red; font-style: italic;">{{ message }}</p>
+
+                        {% endfor %}
+
+                    {% endif %}
+
+                {% endwith %}
                 <input class="form-input register-form" name="name" type="text" placeholder="Nome" maxlength="35" required>
                 
                 <input class="form-input register-form" name="nickname" type="text" placeholder="Apelido" required>
