@@ -52,7 +52,7 @@ def time_now(mode=None):
 
 def db_execute(comando: str, get: str = None, mode=None):
 
-    with psycopg2.connect(database='railway', host='roundhouse.proxy.rlwy.net', user='postgres', port=37045, password='ACDBcFaD23aEAC1gCdFac4e4a-6aEd3c') as db:
+   with # db config... HIDDEN.
         cursor = db.cursor()
         if get == 'GET':
             cursor.execute(comando)
