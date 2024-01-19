@@ -1,6 +1,6 @@
 from flask_login import UserMixin
 from random import randint
-import datetime
+from datetime import datetime, timedelta, timezone
 import psycopg2
 
 
@@ -38,17 +38,15 @@ def create_identifier(length):
 
 def time_now(mode=None):
     
-    
-    d = datetime.datetime.utcnow()
-    month = d.strftime('%B')
-    months = {'January': 'jan', 'February': 'fev', 'March': 'mar', 'April': 'abril', 'May': 'maio', 'June': 'jun', 'July': 'jul',
+    month = datetime.strftime('%B')
+    months = {'January': 'jan', 'February': 'fev', 'March': 'mar', 'April': 'abr', 'May': 'mai', 'June': 'jun', 'July': 'jul',
             ' August': 'ago', 'September': 'set','October': 'out', 'November': 'nov', 'December': 'dec'}
-    data = d.strftime(f'ás %H:%Mhrs - %d, {months[f"{month}"]} %Y.')
 
     if mode == 'register':
-        acc_created_at = d.strftime(f'Membro desde %d, {months[f"{month}"]} de %Y. ')
+        acc_created_at = datetime.strftime(f'Membro desde %d, {months[f"{month}"]} de %Y. ')
         return acc_created_at
-
+    
+    data = datetime.now().astimezone(timezone(timedelta(hours=-3))).strftime(f'ás %H:%Mhrs - %d, {months[f"{month}"]} %Y')
     return data
 
 
