@@ -53,6 +53,8 @@ document.querySelectorAll('#show-answer-form').forEach( (getAnswerForm) => {
     getAnswerForm.addEventListener('click', () => {
         formElement = getAnswerForm.closest('.answer-full-interact-coments').lastElementChild
         formElement.style.display = 'flex'
+        window.location.href = "#sending-answer-get"
+        console.log('eoqqqqqq')
     })
 })
 

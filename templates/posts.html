@@ -63,7 +63,6 @@
                         </div>
                         
                     <div class="hpc-rating-info">
-                        <p>2 views</p>
 
                         <span title="{% if post.likes.length == 0 %}Nenhuma avaliação{% else %} {% if post.likes.length == 1 %} 1 pessoa gostou deste post{% else %} {{ post.likes.length }} pessoas gostaram deste post {% endif %} {% endif %}" id="like" name="{{ post.identifier }}">{% if post.likes.is_liked %}<i class="fa-regular fa-thumbs-up" id="got-clicked"></i>{% if post.likes.length > 0 %} {{ post.likes.length}}{%endif%}{% else %}<i class="fa-regular fa-thumbs-up"></i>{% if post.likes.length > 0 %} {{ post.likes.length}}{%endif%} {% endif %}</span>
 
@@ -75,7 +74,7 @@
                             <span title="Você não segue esse usuário!" class="follow-user follow" value="{{ post.user.identifier }}">Seguir</span>
                         {% endif %}
 
-                        <button type="button" onclick="makeComent()">Comentar</button>
+                        <a href="#making-a-comment"><button type="button" onclick="makeComent()">Comentar</button></a>
                     </div>
                     </div>
                     <div class="hpc-title">
@@ -90,7 +89,7 @@
             </div>
 
             
-            <form class="making-a-comment" action="{{ url_for('comment', identifier=post.identifier, mode='c', answer_identifier='None') }}
+            <form id="making-a-comment" class="making-a-comment" action="{{ url_for('comment', identifier=post.identifier, mode='c', answer_identifier='None') }}
             " method="POST">
                 <textarea name="answer" cols="30" rows="10" placeholder="Digite seu comentário aqui..." minlength="1" required></textarea>
                 <div>
@@ -113,7 +112,7 @@
                         <div class="answer-user-profile a-u-p-img">
                             {% if comment.len_answer >= 1 %}
                             <div class="answer-count">
-                            <abbr title="Esconder respostas"><i class="fa-solid fa-chevron-up"></i></abbr>
+                            <i title="Esconder respostas" class="fa-solid fa-chevron-up"></i>
                             <p>{{ comment.len_answer }}</p>
                         </div>
                         {% endif %}
@@ -123,7 +122,7 @@
                         <div class="answer-user-content a-u-c" id="subanswer-content">
 
                             <div class="answer-user-content-name a-u-c-n">
-                                <p>{{ showname(comment.user.name) }} - comentou:</p>
+                                <p>{{ comment.user.name }} - comentou:</p>
                             </div>
                             <div class="answer-user-content-text a-u-c-t">
                                 <p class="text-class-get">{{ comment.text }}
@@ -177,7 +176,7 @@
                             <div class="subanswer-user-content a-u-c" id="subanswer-content">
     
                                 <div class="subanswer-user-content-name a-u-c-n">
-                                    <p> {{ showname(answer.user.name) }} - respondeu:</p>
+                                    <p> {{ answer.user.name }} - respondeu:</p>
                                 </div>
                                 <div class="subanswer-user-content-text a-u-c-t">
                                     <p class="text-class-get">{{ answer.text }}
@@ -227,7 +226,7 @@
                 
             </div>
             <div class="making-a-answer">
-                <form class="sending-answer" action="{{ url_for('comment', identifier=post.identifier, mode='a', answer_identifier=comment.identifier) }}" method="POST">
+                <form id="sending-answer-get" class="sending-answer" action="{{ url_for('comment', identifier=post.identifier, mode='a', answer_identifier=comment.identifier) }}" method="POST">
                     <textarea name="answer" cols="30" rows="10" minlength="10" placeholder="Escreva sua resposta aqui..." required></textarea>
                     <div>
                         <button type="submit">Responder</button>

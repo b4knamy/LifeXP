@@ -1402,6 +1402,7 @@ img {
 
 
 @media screen and (min-width: 768px) and (max-width: 1023px) {
+    
     .navbar-options {
         right: 15%;
     }
@@ -1483,6 +1484,21 @@ img {
 
 
 @media screen and (max-width: 767px) {
+    .making-a-answer {
+        grid-area: 3 / 1 / 4 / 5;
+        width: 100%;
+    }
+    .sending-answer {
+        width: 100%;
+        left: 0%;
+    }
+    .sending-answer textarea{
+        width: 100%;
+    }
+    .sending-answer div {
+        right: 15px;
+    }
+
     .navbar-options {
         right: 7%;
         gap: 5px ;
@@ -1515,6 +1531,10 @@ img {
         flex-direction: column;
         align-items: center;
     }
+    .answer-count {
+        right: 13px;
+        top: 45px;
+    }
     #user-content-info {
         flex-direction: row;
         width: 80%;
@@ -1531,8 +1551,11 @@ img {
         left: 10%;
     }
     #profile-img {
-        width: 60px;
-        height: 60px;
+        width: 45px;
+        height: 45px;
+        position: relative;
+        left: 10px;
+        top: 5px;
     }
 
     .user-home-options {
@@ -1557,8 +1580,8 @@ img {
         font-size: 15px !important;
     }
     .list-posts-profile-user img {
-        width: 60px;
-        height: 60px;
+        width: 45px;
+        height: 45px;
     }
     .list-posts-title-user {
         gap: 20px;
@@ -1592,6 +1615,9 @@ img {
     .logo-lifexp {
         top: 0;
         width: 80%;
+    }
+    .dropdown-menu {
+        top: 40px;
     }
     .logo-lifexp p {
         text-align: center;
@@ -1654,7 +1680,7 @@ img {
         grid-area: none;
         display: flex;
         flex-direction: row;
-        height: 100px;
+        height: 120px;
         position: relative;
         align-items: center;
         justify-content: center;
@@ -1669,8 +1695,8 @@ img {
         box-shadow: none;
     }
     .rating #user-profile-img {
-        width: 60px;
-        height: 60px;
+        width: 45px;
+        height: 45px;
     }
     .rating p {
         position: relative;

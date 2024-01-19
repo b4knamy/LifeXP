@@ -7,7 +7,7 @@ from flask_login import current_user, login_user, logout_user, login_manager, lo
 
 #       FLASK APP CONFIG
 app = Flask(__name__, static_folder="static", template_folder="templates")
-
+app.secret_key = 'LXproject'
 
 
     #       LOGIN CONFIG
@@ -18,7 +18,7 @@ login_manager.anonymous_user = AnonymousUserMixin
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User(db_execute(f'SELECT * FROM user WHERE id = {user_id};', 'GET').fetchone())
+    return User(db_execute(f'SELECT * FROM users WHERE id = {user_id};', 'GET', 'one'))
 
 
 #       PAGES'S LOGIC  
@@ -40,7 +40,7 @@ def login():
         email = request.form.get('email')
 
         # checking if the user password is equal
-        is_an_user = db_execute(f"SELECT * FROM user WHERE email = '{email}'", 'GET').fetchone()
+        is_an_user = db_execute(f"SELECT * FROM users WHERE email = '{email}'", 'GET', 'one')
 
         if is_an_user == None:
 
@@ -60,7 +60,7 @@ def login():
 
     return render_template('login.html')
 
-@app.route('/register', methods=['POST'])
+@app.route('/register', methods=['POST', 'GET'])
 def register():
 
     if request.method == 'POST':
@@ -72,11 +72,11 @@ def register():
 
         hashed_password = generate_password_hash(password=password, salt_length=16)
         
-        new_user = db_execute(f'SELECT * FROM user WHERE email = "{email}";', 'GET').fetchone()
+        new_user = db_execute(f"SELECT * FROM users WHERE email = '{email}';", 'GET', 'one')
 
         if new_user == None:
 
-            db_execute(f"INSERT INTO user (name, nickname, email, password, identifier, created_at) VALUES ('{name}', '{nickname}', '{email}', '{hashed_password}', '{create_identifier(12)}', '{time_now(mode='register')}');")
+            db_execute(f"INSERT INTO users (name, nickname, email, password, identifier, created_at) VALUES ('{name}', '{nickname}', '{email}', '{hashed_password}', '{create_identifier(12)}', '{time_now(mode='register')}');")
 
             return redirect(url_for('login'))
         else:
@@ -94,7 +94,7 @@ def logout():
 @login_required
 def homepage():
     posts_list = []
-    posts = db_execute('SELECT * FROM post', 'GET').fetchall()
+    posts = db_execute('SELECT * FROM post', 'GET', 'all')
     for post in posts:
         
         new_post = Post(
@@ -110,15 +110,15 @@ def homepage():
             )
         posts_list.append(new_post)
 
-    current_user_identifier = db_execute(f"SELECT identifier FROM user WHERE id = {current_user.id};", 'GET').fetchone()[0]
-    return render_template('listofposts.html', showname=showname, all_posts=posts_list, current_user_identifier=current_user_identifier)
+    current_user_identifier = db_execute(f"SELECT identifier FROM users WHERE id = {current_user.id};", 'GET', 'one')[0]
+    return render_template('listofposts.html', all_posts=posts_list, current_user_identifier=current_user_identifier)
 
 
 @app.route('/myposts')
 @login_required
 def myposts():
         
-        all_posts = db_execute(f'SELECT * FROM post WHERE user_id = {current_user.id}', 'GET').fetchall()
+        all_posts = db_execute(f'SELECT * FROM post WHERE user_id = {current_user.id}', 'GET', 'all')
 
         result = []
         for post in all_posts:
@@ -136,7 +136,7 @@ def myposts():
                     )
             result.append(new_post)
 
-        return render_template('showing_user_posts.html', user_posts=result,  showname=showname)
+        return render_template('showing_user_posts.html', user_posts=result)
 
 @app.route('/makepost', methods=['GET', 'POST'])
 @login_required
@@ -146,7 +146,7 @@ def makepost():
         
         title = request.form.get('title')
         texto = request.form.get('story')
-        db_execute(f'INSERT INTO post (user_id, titulo, texto, created_at, identifier) VALUES ({current_user.id}, "{title}", "{texto}", "{time_now()}", "{create_identifier(10)}");')
+        db_execute(f"INSERT INTO post (user_id, titulo, texto, created_at, identifier) VALUES ({current_user.id}, '{title}', '{texto}', '{time_now()}', '{create_identifier(10)}');")
         
         
         return redirect(url_for('homepage'))
@@ -160,7 +160,7 @@ def makepost():
 def post(identifier):
     # GETTING THE MAIN POST DATA
 
-    current_post = db_execute(f'SELECT * FROM post WHERE identifier = "{identifier}"', 'GET').fetchone()
+    current_post = db_execute(f"SELECT * FROM post WHERE identifier = '{identifier}'", 'GET', 'one')
     main_post = Post(
                 id=current_post[0],
                 user_id=current_post[1],
@@ -177,7 +177,7 @@ def post(identifier):
 
     # CHECKING IF THE CURRENT USER IS FOLLOWING THE POST OWNER
 
-    if db_execute(f'SELECT * FROM follow WHERE following_id = {current_user.id} and followed_id = {main_post.user.id}', 'GET').fetchone() == None:
+    if db_execute(f'SELECT * FROM follow WHERE following_id = {current_user.id} and followed_id = {main_post.user.id}', 'GET', 'one') == None:
         is_already_followed = False
     else:
         is_already_followed = True
@@ -187,7 +187,7 @@ def post(identifier):
 
     # CHECKING IF THE CURRENT USER IS FOLLOWING THE POST OWNER       ---END
 
-    return render_template('posts.html', post=main_post, is_following=is_already_followed, showname=showname)
+    return render_template('posts.html', post=main_post, is_following=is_already_followed)
 
 
 
@@ -207,7 +207,7 @@ def change_post(identifier):
 @app.route('/delete-post/<identifier>', methods=["GET"])
 @login_required
 def delete_post(identifier):
-    db_execute(f'DELETE FROM post WHERE identifier = "{identifier}"')
+    db_execute(f"DELETE FROM post WHERE identifier = '{identifier}'")
 
     return redirect(url_for('myposts'))
 
@@ -216,10 +216,10 @@ def delete_post(identifier):
 def delete_comment(identifier, answer_identifier, mode):
     
     if mode == 'pa':
-        db_execute(f'DELETE FROM post_comment WHERE identifier = "{answer_identifier}";')
+        db_execute(f"DELETE FROM post_comment WHERE identifier = '{answer_identifier}';")
 
     if mode == 'psa':
-        db_execute(f'DELETE FROM post_answer WHERE identifier = "{answer_identifier}";')
+        db_execute(f"DELETE FROM post_answer WHERE identifier = '{answer_identifier}';")
 
     return redirect(url_for('post', identifier=identifier))
 
@@ -238,23 +238,23 @@ def comment(identifier, mode, answer_identifier):
         
 
             if mode == 'c':
-                post_id = db_execute(f'SELECT id FROM post WHERE identifier = "{identifier}"', 'GET').fetchone()[0]
+                post_id = db_execute(f"SELECT id FROM post WHERE identifier = '{identifier}'", 'GET', 'one')[0]
 
-                db_execute(f'INSERT INTO post_comment (user_id, post_id, texto, created_at, identifier, was_edited) VALUES ({current_user.id}, {post_id},"{text}", "{time_now()}", "{create_identifier(8)}", "false");')
+                db_execute(f"INSERT INTO post_comment (user_id, post_id, texto, created_at, identifier, was_edited) VALUES ({current_user.id}, {post_id},'{text}', '{time_now()}', '{create_identifier(8)}', 'false');")
 
             if mode == 'ec':
                 
-                db_execute(f'UPDATE post_comment SET texto = "{text}", was_edited = "true" WHERE identifier = "{answer_identifier}"')
+                db_execute(f"UPDATE post_comment SET texto = '{text}', was_edited = 'true' WHERE identifier = '{answer_identifier}'")
 
             if mode == 'ea':
 
-                db_execute(f'UPDATE post_answer SET texto = "{text}", was_edited = "true" WHERE identifier = "{answer_identifier}"')
+                db_execute(f"UPDATE post_answer SET texto = '{text}', was_edited = 'true' WHERE identifier = '{answer_identifier}'")
 
             if mode == 'a':
 
-                post_answer_id = db_execute(f'SELECT id FROM post_comment WHERE identifier = "{answer_identifier}"', 'GET').fetchone()[0]
+                post_answer_id = db_execute(f"SELECT id FROM post_comment WHERE identifier = '{answer_identifier}'", 'GET', 'one')[0]
 
-                db_execute(f'INSERT INTO post_answer (user_id, comment_id, texto, created_at, identifier, was_edited) VALUES ({current_user.id}, {post_answer_id}, "{text}", "{time_now()}", "{create_identifier(6)}" , "false");')
+                db_execute(f"INSERT INTO post_answer (user_id, comment_id, texto, created_at, identifier, was_edited) VALUES ({current_user.id}, {post_answer_id}, '{text}', '{time_now()}', '{create_identifier(6)}' , 'false');")
         
         return redirect(url_for('post', identifier=identifier))
 
@@ -271,9 +271,9 @@ def comment(identifier, mode, answer_identifier):
 @login_required
 def follow(identifier):
         
-        followed_user_id = db_execute(f"SELECT id FROM user WHERE identifier = '{identifier}';", 'GET').fetchone()[0]
+        followed_user_id = db_execute(f"SELECT id FROM users WHERE identifier = '{identifier}';", 'GET', 'one')[0]
 
-        is_already_followed = db_execute(f'SELECT * FROM follow WHERE followed_id = {followed_user_id} and following_id = {current_user.id};', 'GET').fetchone()
+        is_already_followed = db_execute(f'SELECT * FROM follow WHERE followed_id = {followed_user_id} and following_id = {current_user.id};', 'GET', 'one')
 
         if is_already_followed == None:
 
@@ -291,7 +291,7 @@ def lod(identifier, mode):
         
         identifier_size = len(identifier)
         if identifier_size == 6:
-            data = db_execute(f'SELECT id, user_id FROM post_answer WHERE identifier = "{identifier}";', 'GET').fetchone()
+            data = db_execute(f"SELECT id, user_id FROM post_answer WHERE identifier = '{identifier}';", 'GET', 'one')
             id = data[0]
             id_user_loded = data[1]
 
@@ -300,14 +300,14 @@ def lod(identifier, mode):
             
 
         elif identifier_size == 8:
-            data = db_execute(f'SELECT id, user_id FROM post_comment WHERE identifier = "{identifier}";', 'GET').fetchone()
+            data = db_execute(f"SELECT id, user_id FROM post_comment WHERE identifier = '{identifier}';", 'GET', 'one')
             id = data[0]
             id_user_loded = data[1]
             table = 'lod_comment'
             column_name = 'comment_id'
 
         elif identifier_size == 10:
-            data = db_execute(f'SELECT id, user_id FROM post WHERE identifier = "{identifier}";', 'GET').fetchone()
+            data = db_execute(f"SELECT id, user_id FROM post WHERE identifier = '{identifier}';", 'GET', 'one')
             id = data[0]
             id_user_loded = data[1]
             table = 'lod_post'
@@ -315,16 +315,15 @@ def lod(identifier, mode):
 
 
         
-        is_lod = db_execute(f'SELECT user_id, {column_name}, like, dislike FROM {table} WHERE user_id = {current_user.id} and {column_name} = {id};', 'GET').fetchone()
+        is_lod = db_execute(f'SELECT user_id, {column_name}, likes, dislikes FROM {table} WHERE user_id = {current_user.id} and {column_name} = {id};', 'GET', 'one')
 
         if is_lod == None:
 
             if mode == 'like':
-                    db_execute(f'INSERT INTO {table} (user_id, {column_name}, user_loded, like, dislike) VALUES ({current_user.id}, {id}, {id_user_loded}, 1, 0);')
+                    db_execute(f'INSERT INTO {table} (user_id, {column_name}, user_loded, likes, dislikes) VALUES ({current_user.id}, {id}, {id_user_loded}, 1, 0);')
 
             elif mode == 'dislike':
-                    print('dislikeiii???')
-                    db_execute(f'INSERT INTO {table} (user_id, {column_name}, user_loded,  like, dislike) VALUES ({current_user.id}, {id}, {id_user_loded}, 0, 1);')
+                    db_execute(f'INSERT INTO {table} (user_id, {column_name}, user_loded,  likes, dislikes) VALUES ({current_user.id}, {id}, {id_user_loded}, 0, 1);')
 
         else:
 
@@ -334,9 +333,9 @@ def lod(identifier, mode):
                     if is_lod[3] == 0:
                         db_execute(f'DELETE FROM {table} WHERE user_id = {current_user.id} and {column_name} = {id};')
                     else:
-                        db_execute(f'UPDATE {table} SET like = 0 WHERE user_id = {current_user.id} and {column_name} = {id};')
+                        db_execute(f'UPDATE {table} SET likes = 0 WHERE user_id = {current_user.id} and {column_name} = {id};')
                 else:
-                    db_execute(f'UPDATE {table} SET like = 1 WHERE user_id = {current_user.id} and {column_name} = {id};')
+                    db_execute(f'UPDATE {table} SET likes = 1 WHERE user_id = {current_user.id} and {column_name} = {id};')
 
             elif mode == 'dislike':
                     
@@ -344,9 +343,9 @@ def lod(identifier, mode):
                     if is_lod[2] == 0:
                         db_execute(f'DELETE FROM {table} WHERE user_id = {current_user.id} and {column_name} = {id};')
                     else:
-                        db_execute(f'UPDATE {table} SET dislike = 0 WHERE user_id = {current_user.id} and {column_name} = {id};')
+                        db_execute(f'UPDATE {table} SET dislikes = 0 WHERE user_id = {current_user.id} and {column_name} = {id};')
                 else:
-                    db_execute(f'UPDATE {table} SET dislike = 1 WHERE user_id = {current_user.id} and {column_name} = {id};')
+                    db_execute(f'UPDATE {table} SET dislikes = 1 WHERE user_id = {current_user.id} and {column_name} = {id};')
 
         return "sucess", 200
         
@@ -354,11 +353,11 @@ def lod(identifier, mode):
 @login_required
 def profile(identifier):
     error = None
-    get_user = db_execute(f'SELECT * FROM user WHERE identifier = "{identifier}";', 'GET').fetchone()
+    get_user = db_execute(f"SELECT * FROM users WHERE identifier = '{identifier}';", 'GET', 'one')
 
     user = User(get_user, get_info='GET')
     
-    if db_execute(f'SELECT * FROM follow WHERE following_id = {current_user.id} and followed_id = {user.id}', 'GET').fetchone() == None:
+    if db_execute(f'SELECT * FROM follow WHERE following_id = {current_user.id} and followed_id = {user.id}', 'GET', 'one') == None:
         is_already_followed = False
     else:
         is_already_followed = True
@@ -376,21 +375,16 @@ def profile(identifier):
 
             if check_password_hash(pwhash=current_user.password, password=password):
                 new_hashed_password = generate_password_hash(new_password)
-                print(new_password, password, new_hashed_password, '===========================================================')
-                
 
                 if current_user.email == email:
-                    db_execute(f'UPDATE user SET name = "{nome}", nickname = "{nickname}", password = "{new_hashed_password}", image = "{image}" WHERE id = {current_user.id};')
-
-                    print('PASSEI SEM EMAIL COM PASSWORD')
+                    db_execute(f"UPDATE users SET name = '{nome}', nickname = '{nickname}', password = '{new_hashed_password}', image = '{image}' WHERE id = {current_user.id};")
 
                     return redirect(url_for("profile", identifier=current_user.identifier))
 
-                if db_execute(f'SELECT email FROM user WHERE email = "{email}"', 'GET').fetchone() == None:
+                if db_execute(f"SELECT email FROM users WHERE email = '{email}'", 'GET', 'one') == None:
 
-                    db_execute(f'UPDATE user SET name = "{nome}", nickname = "{nickname}", email = "{email}", password = "{new_hashed_password}", image = "{image}" WHERE id = {current_user.id};')
+                    db_execute(f"UPDATE users SET name = '{nome}', nickname = '{nickname}', email = '{email}', password = '{new_hashed_password}', image = '{image}' WHERE id = {current_user.id};")
 
-                    print('PASSEI NO EMAIL COM PASSWORD')
                 else:
                     flash('Este email já está sendo usado!')
                     
@@ -402,17 +396,13 @@ def profile(identifier):
         
         
         if current_user.email == email:
-            db_execute(f'UPDATE user SET name = "{nome}", nickname = "{nickname}", image = "{image}" WHERE id = {current_user.id};')
-
-            print('PASSEI NO SEM EMAIL E  SEM PASSWORD')
+            db_execute(f"UPDATE users SET name = '{nome}', nickname = '{nickname}', image = '{image}' WHERE id = {current_user.id};")
 
             return redirect(url_for("profile", identifier=current_user.identifier))
 
-        if db_execute(f'SELECT email FROM user WHERE email = "{email}"', 'GET').fetchone() == None:
-            print(email, '===========================')
-            db_execute(f'UPDATE user SET name = "{nome}", nickname = "{nickname}", email = "{email}", image = "{image}" WHERE id = {current_user.id};')
+        if db_execute(f"SELECT email FROM users WHERE email = '{email}'", 'GET', 'one') == None:
 
-            print('PASSEI NO EMAIL SEM PASSWORD')
+            db_execute(f"UPDATE users SET name = '{nome}', nickname = '{nickname}', email = '{email}', image = '{image}' WHERE id = {current_user.id};")
 
             return redirect(url_for("profile", identifier=current_user.identifier))
         else:
@@ -425,9 +415,9 @@ def profile(identifier):
 @app.route('/post/save_post/<identifier>', methods=['POST'])
 @login_required
 def saving_post(identifier):
-    post_id = db_execute(f'SELECT id FROM post WHERE identifier = "{identifier}";', 'GET').fetchone()[0]
+    post_id = db_execute(f"SELECT id FROM post WHERE identifier = '{identifier}';", 'GET', 'one')[0]
 
-    is_already_saved = db_execute(f'SELECT * FROM save_post WHERE user_id = {current_user.id} and post_id = {post_id};', 'GET').fetchone()
+    is_already_saved = db_execute(f'SELECT * FROM save_post WHERE user_id = {current_user.id} and post_id = {post_id};', 'GET', 'one')
 
     if is_already_saved == None:
         db_execute(f'INSERT INTO save_post (user_id, post_id) VALUES ({current_user.id}, {post_id})')
@@ -440,11 +430,11 @@ def saving_post(identifier):
 @login_required
 def saved_post(): 
 
-    all_save_post = db_execute(f'SELECT post_id FROM save_post WHERE user_id = {current_user.id}', 'GET').fetchall()
+    all_save_post = db_execute(f'SELECT post_id FROM save_post WHERE user_id = {current_user.id}', 'GET', 'all')
 
     result = []
     for post_id in all_save_post:
-        get_post = db_execute(f'SELECT * FROM post WHERE id = {post_id[0]}', 'GET').fetchone()
+        get_post = db_execute(f'SELECT * FROM post WHERE id = {post_id[0]}', 'GET', 'one')
 
         result.append(Post(
                 id=get_post[0],
@@ -458,10 +448,9 @@ def saved_post():
                 get_lod='GET'
             ))
 
-    return render_template('save_post.html', save_post=result, showname=showname)
-
+    return render_template('save_post.html', save_post=result)
 
 #   RUNNING THE APP IF IS MAIN
 if __name__ == '__main__':
-    app.secret_key = 'LXproject'
-    app.run()
+    
+    app.run(debug=True)
