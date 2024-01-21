@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect, request, flash, make_response
+from flask import Flask, render_template, url_for, redirect, request, flash
 from project_utils import *
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import current_user, login_user, logout_user, login_manager, login_required, LoginManager, AnonymousUserMixin
@@ -18,7 +18,7 @@ login_manager.anonymous_user = AnonymousUserMixin
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User(db_execute(f'SELECT * FROM users WHERE id = {user_id};', 'GET', 'one'))
+    return User(db_execute(f'SELECT * FROM users WHERE id = {user_id};', 'GET').fetchone())
 
 
 #       PAGES'S LOGIC  
@@ -40,7 +40,7 @@ def login():
         email = request.form.get('email')
 
         # checking if the user password is equal
-        is_an_user = db_execute(f"SELECT * FROM users WHERE email = '{email}'", 'GET', 'one')
+        is_an_user = db_execute(f"SELECT * FROM users WHERE email = '{email}'", 'GET').fetchone()
 
         if is_an_user == None:
 
@@ -72,7 +72,7 @@ def register():
 
         hashed_password = generate_password_hash(password=password, salt_length=16)
         
-        new_user = db_execute(f"SELECT * FROM users WHERE email = '{email}';", 'GET', 'one')
+        new_user = db_execute(f"SELECT * FROM users WHERE email = '{email}';", 'GET').fetchone()
 
         if new_user == None:
 
@@ -94,7 +94,7 @@ def logout():
 @login_required
 def homepage():
     posts_list = []
-    posts = db_execute('SELECT * FROM post', 'GET', 'all')
+    posts = db_execute('SELECT * FROM post', 'GET').fetchall()
     for post in posts:
         
         new_post = Post(
@@ -110,7 +110,7 @@ def homepage():
             )
         posts_list.append(new_post)
 
-    current_user_identifier = db_execute(f"SELECT identifier FROM users WHERE id = {current_user.id};", 'GET', 'one')[0]
+    current_user_identifier = db_execute(f"SELECT identifier FROM users WHERE id = {current_user.id};", 'GET').fetchone()[0]
     return render_template('listofposts.html', all_posts=posts_list, current_user_identifier=current_user_identifier)
 
 
@@ -118,7 +118,7 @@ def homepage():
 @login_required
 def myposts():
         
-        all_posts = db_execute(f'SELECT * FROM post WHERE user_id = {current_user.id}', 'GET', 'all')
+        all_posts = db_execute(f'SELECT * FROM post WHERE user_id = {current_user.id}', 'GET').fetchall()
 
         result = []
         for post in all_posts:
@@ -160,7 +160,7 @@ def makepost():
 def post(identifier):
     # GETTING THE MAIN POST DATA
 
-    current_post = db_execute(f"SELECT * FROM post WHERE identifier = '{identifier}'", 'GET', 'one')
+    current_post = db_execute(f"SELECT * FROM post WHERE identifier = '{identifier}'", 'GET').fetchone()
     main_post = Post(
                 id=current_post[0],
                 user_id=current_post[1],
@@ -177,7 +177,7 @@ def post(identifier):
 
     # CHECKING IF THE CURRENT USER IS FOLLOWING THE POST OWNER
 
-    if db_execute(f'SELECT * FROM follow WHERE following_id = {current_user.id} and followed_id = {main_post.user.id}', 'GET', 'one') == None:
+    if db_execute(f'SELECT * FROM follow WHERE following_id = {current_user.id} and followed_id = {main_post.user.id}', 'GET').fetchone() == None:
         is_already_followed = False
     else:
         is_already_followed = True
@@ -238,7 +238,7 @@ def comment(identifier, mode, answer_identifier):
         
 
             if mode == 'c':
-                post_id = db_execute(f"SELECT id FROM post WHERE identifier = '{identifier}'", 'GET', 'one')[0]
+                post_id = db_execute(f"SELECT id FROM post WHERE identifier = '{identifier}'", 'GET').fetchone()[0]
 
                 db_execute(f"INSERT INTO post_comment (user_id, post_id, texto, created_at, identifier, was_edited) VALUES ({current_user.id}, {post_id},'{text}', '{time_now()}', '{create_identifier(8)}', 'false');")
 
@@ -252,7 +252,7 @@ def comment(identifier, mode, answer_identifier):
 
             if mode == 'a':
 
-                post_answer_id = db_execute(f"SELECT id FROM post_comment WHERE identifier = '{answer_identifier}'", 'GET', 'one')[0]
+                post_answer_id = db_execute(f"SELECT id FROM post_comment WHERE identifier = '{answer_identifier}'", 'GET').fetchone()[0]
 
                 db_execute(f"INSERT INTO post_answer (user_id, comment_id, texto, created_at, identifier, was_edited) VALUES ({current_user.id}, {post_answer_id}, '{text}', '{time_now()}', '{create_identifier(6)}' , 'false');")
         
@@ -271,9 +271,9 @@ def comment(identifier, mode, answer_identifier):
 @login_required
 def follow(identifier):
         
-        followed_user_id = db_execute(f"SELECT id FROM users WHERE identifier = '{identifier}';", 'GET', 'one')[0]
+        followed_user_id = db_execute(f"SELECT id FROM users WHERE identifier = '{identifier}';", 'GET').fetchone()[0]
 
-        is_already_followed = db_execute(f'SELECT * FROM follow WHERE followed_id = {followed_user_id} and following_id = {current_user.id};', 'GET', 'one')
+        is_already_followed = db_execute(f'SELECT * FROM follow WHERE followed_id = {followed_user_id} and following_id = {current_user.id};', 'GET').fetchone()
 
         if is_already_followed == None:
 
@@ -291,7 +291,7 @@ def lod(identifier, mode):
         
         identifier_size = len(identifier)
         if identifier_size == 6:
-            data = db_execute(f"SELECT id, user_id FROM post_answer WHERE identifier = '{identifier}';", 'GET', 'one')
+            data = db_execute(f"SELECT id, user_id FROM post_answer WHERE identifier = '{identifier}';", 'GET').fetchone()
             id = data[0]
             id_user_loded = data[1]
 
@@ -300,14 +300,14 @@ def lod(identifier, mode):
             
 
         elif identifier_size == 8:
-            data = db_execute(f"SELECT id, user_id FROM post_comment WHERE identifier = '{identifier}';", 'GET', 'one')
+            data = db_execute(f"SELECT id, user_id FROM post_comment WHERE identifier = '{identifier}';", 'GET').fetchone()
             id = data[0]
             id_user_loded = data[1]
             table = 'lod_comment'
             column_name = 'comment_id'
 
         elif identifier_size == 10:
-            data = db_execute(f"SELECT id, user_id FROM post WHERE identifier = '{identifier}';", 'GET', 'one')
+            data = db_execute(f"SELECT id, user_id FROM post WHERE identifier = '{identifier}';", 'GET').fetchone()
             id = data[0]
             id_user_loded = data[1]
             table = 'lod_post'
@@ -315,7 +315,7 @@ def lod(identifier, mode):
 
 
         
-        is_lod = db_execute(f'SELECT user_id, {column_name}, likes, dislikes FROM {table} WHERE user_id = {current_user.id} and {column_name} = {id};', 'GET', 'one')
+        is_lod = db_execute(f'SELECT user_id, {column_name}, likes, dislikes FROM {table} WHERE user_id = {current_user.id} and {column_name} = {id};', 'GET').fetchone()
 
         if is_lod == None:
 
@@ -353,11 +353,11 @@ def lod(identifier, mode):
 @login_required
 def profile(identifier):
     error = None
-    get_user = db_execute(f"SELECT * FROM users WHERE identifier = '{identifier}';", 'GET', 'one')
+    get_user = db_execute(f"SELECT * FROM users WHERE identifier = '{identifier}';", 'GET').fetchone()
 
     user = User(get_user, get_info='GET')
     
-    if db_execute(f'SELECT * FROM follow WHERE following_id = {current_user.id} and followed_id = {user.id}', 'GET', 'one') == None:
+    if db_execute(f'SELECT * FROM follow WHERE following_id = {current_user.id} and followed_id = {user.id}', 'GET').fetchone() == None:
         is_already_followed = False
     else:
         is_already_followed = True
@@ -381,7 +381,7 @@ def profile(identifier):
 
                     return redirect(url_for("profile", identifier=current_user.identifier))
 
-                if db_execute(f"SELECT email FROM users WHERE email = '{email}'", 'GET', 'one') == None:
+                if db_execute(f"SELECT email FROM users WHERE email = '{email}'", 'GET').fetchone() == None:
 
                     db_execute(f"UPDATE users SET name = '{nome}', nickname = '{nickname}', email = '{email}', password = '{new_hashed_password}', image = '{image}' WHERE id = {current_user.id};")
 
@@ -400,7 +400,7 @@ def profile(identifier):
 
             return redirect(url_for("profile", identifier=current_user.identifier))
 
-        if db_execute(f"SELECT email FROM users WHERE email = '{email}'", 'GET', 'one') == None:
+        if db_execute(f"SELECT email FROM users WHERE email = '{email}'", 'GET').fetchone() == None:
 
             db_execute(f"UPDATE users SET name = '{nome}', nickname = '{nickname}', email = '{email}', image = '{image}' WHERE id = {current_user.id};")
 
@@ -415,9 +415,9 @@ def profile(identifier):
 @app.route('/post/save_post/<identifier>', methods=['POST'])
 @login_required
 def saving_post(identifier):
-    post_id = db_execute(f"SELECT id FROM post WHERE identifier = '{identifier}';", 'GET', 'one')[0]
+    post_id = db_execute(f"SELECT id FROM post WHERE identifier = '{identifier}';", 'GET').fetchone()[0]
 
-    is_already_saved = db_execute(f'SELECT * FROM save_post WHERE user_id = {current_user.id} and post_id = {post_id};', 'GET', 'one')
+    is_already_saved = db_execute(f'SELECT * FROM save_post WHERE user_id = {current_user.id} and post_id = {post_id};', 'GET').fetchone()
 
     if is_already_saved == None:
         db_execute(f'INSERT INTO save_post (user_id, post_id) VALUES ({current_user.id}, {post_id})')
@@ -430,11 +430,11 @@ def saving_post(identifier):
 @login_required
 def saved_post(): 
 
-    all_save_post = db_execute(f'SELECT post_id FROM save_post WHERE user_id = {current_user.id}', 'GET', 'all')
+    all_save_post = db_execute(f'SELECT post_id FROM save_post WHERE user_id = {current_user.id}', 'GET').fetchall()
 
     result = []
     for post_id in all_save_post:
-        get_post = db_execute(f'SELECT * FROM post WHERE id = {post_id[0]}', 'GET', 'one')
+        get_post = db_execute(f'SELECT * FROM post WHERE id = {post_id[0]}', 'GET').fetchone()
 
         result.append(Post(
                 id=get_post[0],

@@ -1768,8 +1768,10 @@ img {
         left: 10px;
     }
     .profile-options button {
+        position: relative;
         width: 50px;
         font-size: 12px;
+        top: 40px;
     }
     .profile-information .profile-user-scores {
         gap:5px;
