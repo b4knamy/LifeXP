@@ -50,12 +50,6 @@ def time_now(mode=None):
 def db_execute(comando: str, get: str = None):
 
     with sqlite3.connect('instance/lifexp_DB.db') as db:
-
-<<<<<<< HEAD
-=======
-   with # db config... HIDDEN.
-        cursor = db.cursor()
->>>>>>> 194831632095163e5f326969e6d5e1b3daa72bb4
         if get == 'GET':
             return db.execute(comando)
         
